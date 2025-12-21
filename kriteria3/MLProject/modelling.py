@@ -34,7 +34,6 @@ with mlflow.start_run(run_name="insurance_model_training"):
     mlflow.sklearn.log_model(
         sk_model=model,
         artifact_path="model",
-        registered_model_name="insurance_cost_model"
     )
 
     print(f"Mean Squared Error: {mse}")
