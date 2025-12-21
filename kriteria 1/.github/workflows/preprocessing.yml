@@ -23,4 +23,4 @@ jobs:
 
       - name: Run preprocessing
         run: |
-          python preprocessing/automate_khadijatul-kubro.py
+          python preprocessing/automate_khadijatul_kubro.py
