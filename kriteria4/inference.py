@@ -17,7 +17,7 @@ memory_usage = Gauge('memory_usage_mb', 'Memory usage')
 successful_predictions = Counter('successful_predictions_total', 'Successful predictions')
 
 # --- Load model dari MLflow ---
-MODEL_URI = "runs:/<run_id>/model"  # ganti <run_id> dengan run MLflow kamu
+MODEL_URI = "runs:/bf87b979a5264d078503bebe0b2abaf2/model"  
 model = mlflow.sklearn.load_model(MODEL_URI)
 
 @app.route('/predict', methods=['POST'])
