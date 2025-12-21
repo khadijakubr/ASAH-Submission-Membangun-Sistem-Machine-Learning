@@ -12,6 +12,7 @@ import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
+import os
 
 def preprocess_data(input_path, output_path):
     df = pd.read_csv(input_path)
@@ -64,7 +65,17 @@ def preprocess_data(input_path, output_path):
     y_test.to_csv(f"{output_path}/y_test.csv", index=False)
 
 if __name__ == "__main__":
-    preprocess_data(
-        "../healthcareinsurance_raw.csv",
-        "./healthcareinsurance_preprocessing"
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    input_path = os.path.join(
+        BASE_DIR,
+        "..",
+        "healthcareinsurance_raw.csv"
     )
+
+    output_path = os.path.join(
+        BASE_DIR,
+        "healthcareinsurance_preprocessing"
+    )
+
+    preprocess_data(input_path, output_path)
