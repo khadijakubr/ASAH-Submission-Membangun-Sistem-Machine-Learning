@@ -30,7 +30,7 @@ jobs:
 
       - name: Run preprocessing
         run: |
-          python kriteria-1/preprocessing/automate_khadijatul_kubro.py
+          python kriteria1/preprocessing/automate_khadijatul_kubro.py
 
       - name: Commit & Push preprocessing results
         run: |
