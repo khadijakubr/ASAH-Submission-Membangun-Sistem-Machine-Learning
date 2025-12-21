@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify, Response
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 import time
-import random
+import mlflow
+import mlflow.sklearn
 
 app = Flask(__name__)
 
-# Prometheus Metrics
+# --- Prometheus Metrics ---
 prediction_counter = Counter('predictions_total', 'Total predictions')
 prediction_latency = Histogram('prediction_latency_seconds', 'Prediction latency')
 prediction_errors = Counter('prediction_errors_total', 'Prediction errors')
@@ -15,6 +16,10 @@ cpu_usage = Gauge('cpu_usage_percent', 'CPU usage')
 memory_usage = Gauge('memory_usage_mb', 'Memory usage')
 successful_predictions = Counter('successful_predictions_total', 'Successful predictions')
 
+# --- Load model dari MLflow ---
+MODEL_URI = "runs:/<run_id>/model"  # ganti <run_id> dengan run MLflow kamu
+model = mlflow.sklearn.load_model(MODEL_URI)
+
 @app.route('/predict', methods=['POST'])
 def predict():
     active_requests.inc()
@@ -23,19 +28,22 @@ def predict():
     try:
         data = request.json
         features = data.get('features', [])
-        
-        # Simulate prediction
-        prediction = random.uniform(0, 100)
-        
+        if not features:
+            raise ValueError("Fitur tidak boleh kosong")
+
+        # Prediksi dengan model nyata
+        prediction = model.predict([features])[0]
+
         # Update metrics
         prediction_counter.inc()
         successful_predictions.inc()
         latency = time.time() - start_time
         prediction_latency.observe(latency)
-        model_accuracy.set(0.85 + random.uniform(-0.05, 0.05))
-        
+        # Model accuracy bisa diupdate manual atau dari test set
+        model_accuracy.set(0.85)
+
         return jsonify({
-            'prediction': prediction,
+            'prediction': float(prediction),
             'latency': latency
         })
         
@@ -47,20 +55,12 @@ def predict():
 
 @app.route('/metrics')
 def metrics():
-    # FIX: Return dengan Content-Type yang benar
     try:
-        # Update system metrics
-        cpu_usage.set(random.uniform(20, 80))
-        memory_usage.set(random.uniform(100, 500))
-        
-        # Generate metrics dengan Content-Type yang benar
+        cpu_usage.set(50)       # bisa diganti monitoring nyata
+        memory_usage.set(200)   # bisa diganti monitoring nyata
         return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
     except Exception as e:
-        print(f"Error generating metrics: {e}")
-        return Response(
-            "# Error generating metrics\n",
-            mimetype=CONTENT_TYPE_LATEST
-        )
+        return Response("# Error generating metrics\n", mimetype=CONTENT_TYPE_LATEST)
 
 @app.route('/health')
 def health():
